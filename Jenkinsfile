@@ -8,13 +8,6 @@ pipeline {
 
     stages {
 
-        stage('Clone Repository') {
-            steps {
-                git branch: 'main',
-                url: 'https://github.com/naman458/url-shortener-devops.git'
-            }
-        }
-
         stage('Build Backend Image') {
             steps {
                 dir('backend') {
