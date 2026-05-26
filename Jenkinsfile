@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
         FRONTEND_IMAGE = "naman458/url-shortener-frontend"
         BACKEND_IMAGE = "naman458/url-shortener-backend"
     }
@@ -19,7 +18,7 @@ pipeline {
         stage('Build Backend Image') {
             steps {
                 dir('backend') {
-                    bat 'docker build -t %BACKEND_IMAGE% .'
+                    sh 'docker build -t $BACKEND_IMAGE .'
                 }
             }
         }
@@ -27,26 +26,32 @@ pipeline {
         stage('Build Frontend Image') {
             steps {
                 dir('frontend') {
-                    bat 'docker build -t %FRONTEND_IMAGE% .'
+                    sh 'docker build -t $FRONTEND_IMAGE .'
                 }
             }
         }
 
         stage('Docker Hub Login') {
             steps {
-                bat 'docker login -u %DOCKERHUB_CREDENTIALS_USR% -p %DOCKERHUB_CREDENTIALS_PSW%'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                }
             }
         }
 
         stage('Push Backend Image') {
             steps {
-                bat 'docker push %BACKEND_IMAGE%'
+                sh 'docker push $BACKEND_IMAGE'
             }
         }
 
         stage('Push Frontend Image') {
             steps {
-                bat 'docker push %FRONTEND_IMAGE%'
+                sh 'docker push $FRONTEND_IMAGE'
             }
         }
     }
