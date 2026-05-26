@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: naman458/url-shortener-backend:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+
+          env:
+            - name: MONGO_URI
+              value: "mongodb+srv://namanmah458_db_user:c0vAeOsOFghHQhI7@cluster0.ivorqcp.mongodb.net/urlshortener?retryWrites=true&w=majority&appName=Cluster0"
+            - name: BASE_URL
+              value: "http://localhost:5000"
